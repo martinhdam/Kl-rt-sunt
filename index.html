@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="fo">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Sunnir Rættir</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=Source+Sans+3:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: stacked menu cards, each configurable in place; cart summary docks at the bottom */
+:root{
+  --bg:#F1F4F1; --surface:#FFFFFF; --ink:#16231F; --muted:#5A6B65; --line:#D6DFDA;
+  --moss:#2F6B45; --moss-soft:#E1EEE5; --sea:#1D5868; --sea-soft:#DCEBEE; --onaccent:#FFFFFF; --board:#C9B8A3;
+  --f-display:"Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-body:"Source Sans 3", "Segoe UI", Roboto, sans-serif;
+  --f-mono:"DM Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1715; --surface:#17221F; --ink:#E6EEEA; --muted:#97A8A1; --line:#2A3833;
+  --moss:#6DBA86; --moss-soft:#1E3326; --sea:#7CC0D0; --sea-soft:#17303A; --onaccent:#0F1715; --board:#2C2622; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1715; --surface:#17221F; --ink:#E6EEEA; --muted:#97A8A1; --line:#2A3833;
+  --moss:#6DBA86; --moss-soft:#1E3326; --sea:#7CC0D0; --sea-soft:#17303A; --onaccent:#0F1715; --board:#2C2622; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;padding:0 16px 120px}
+.wrap{max-width:760px;margin:0 auto}
+header{padding-block:32px 20px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--moss)}
+h1{font-family:var(--f-display);font-size:clamp(34px,7vw,52px);line-height:1.02;margin:8px 0 12px;text-wrap:balance;letter-spacing:-.02em}
+.intro{font-size:clamp(18px,3.6vw,21px);line-height:1.4;max-width:46ch;margin:10px 0 4px;color:var(--sea);font-weight:600;text-wrap:balance}
+.lede{color:var(--muted);max-width:60ch;margin:0}
+.menu{display:grid;gap:18px;margin-top:16px}
+.tabs{display:flex;gap:6px;margin-top:8px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tabs button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 4px;margin-right:14px;font-family:var(--f-display);font-size:18px;color:var(--muted)}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--moss)}
+.tabs button:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+.dish{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:grid;gap:16px}
+.dish-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.dish-head > div{min-width:0;flex:1 1 260px}
+.num{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+h2{font-family:var(--f-display);font-size:24px;margin:2px 0 4px;line-height:1.15}
+.desc{margin:0;color:var(--muted);font-size:15px}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.tag{font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px;background:var(--moss-soft);color:var(--moss)}
+.tag.diet{background:var(--sea-soft);color:var(--sea)}
+.tag.warn{background:var(--line);color:var(--ink)}
+.price{font-family:var(--f-display);font-size:28px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.price small{font-size:15px;font-weight:500;color:var(--muted)}
+.group{display:grid;gap:6px}
+.glabel{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips input{position:absolute;opacity:0;pointer-events:none}
+.chips label{cursor:pointer;border:1px solid var(--line);border-radius:8px;padding:6px 11px;font-size:15px;background:var(--bg);transition:background .15s,border-color .15s}
+.chips label .x{font-family:var(--f-mono);font-size:12px;color:var(--muted);margin-left:4px}
+.chips input:checked + label{background:var(--sea);border-color:var(--sea);color:var(--onaccent)}
+.chips input:checked + label .x{color:var(--onaccent);opacity:.8}
+.chips input:focus-visible + label{outline:2px solid var(--moss);outline-offset:2px}
+.macros{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);padding-top:14px;gap:8px}
+.m{display:grid;gap:2px}
+.m b{font-family:var(--f-mono);font-weight:500;font-size:20px;font-variant-numeric:tabular-nums}
+.m span{font-size:12px;color:var(--muted)}
+.m.kcal b{color:var(--moss)}
+.bar{height:6px;border-radius:3px;background:var(--line);display:flex;overflow:hidden;grid-column:1/-1}
+.bar i{display:block;height:100%}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.legend{font-size:12px;color:var(--muted);display:flex;gap:12px}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+button{font:inherit;cursor:pointer}
+.add{background:var(--moss);color:var(--onaccent);border:0;border-radius:10px;padding:10px 18px;font-weight:700}
+.add:focus-visible,.cartbar button:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+.drinks-wrap{margin-top:36px;display:grid;gap:6px}
+h2.sec{font-family:var(--f-display);font-size:28px;margin:0}
+.drinks{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:8px}
+.drink{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:8px}
+.drink .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.drink h3{font-family:var(--f-display);font-size:18px;margin:0}
+.drink .dp{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.drink .dn{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.drink .add{padding:8px 14px;justify-self:start}
+.pic{margin:-20px -20px 0;border-radius:14px 14px 0 0;overflow:hidden;background:var(--board);aspect-ratio:400/220;max-width:none}
+.pic svg{display:block;width:100%;height:100%}
+.drink .can{width:100%;height:auto;max-width:100%;display:block}
+.deliv{margin-top:16px}
+.cart{margin-top:32px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+.cart h3{font-family:var(--f-display);font-size:22px;margin:0 0 10px}
+.cart ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.cart li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding-bottom:10px}
+.cart li > div{min-width:0}
+.cart .sub{font-size:13px;color:var(--muted)}
+.cart .rm{background:none;border:0;color:var(--muted);text-decoration:underline;font-size:13px;padding:0}
+.total{display:flex;justify-content:space-between;font-weight:700;margin-top:12px;font-variant-numeric:tabular-nums}
+.empty{color:var(--muted);margin:0}
+.note{font-size:13px;color:var(--muted);margin-top:20px}
+.pay-go{width:100%;margin-top:14px;padding:13px;font-size:17px}
+.co{position:fixed;inset:0;background:rgba(10,18,16,.55);z-index:20;overflow-y:auto;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px))}
+.co-panel{background:var(--surface);color:var(--ink);max-width:560px;margin:0 auto;border-radius:16px;padding:20px;display:grid;gap:14px}
+.co-head{display:flex;justify-content:space-between;align-items:center}
+.co-head h2{margin:0}
+.co-x{background:none;border:0;font-size:20px;color:var(--muted);padding:4px 8px}
+.demo{margin:0;font-size:13px;background:var(--sea-soft);color:var(--sea);padding:8px 10px;border-radius:8px}
+.co-sum{border:1px solid var(--line);border-radius:10px;padding:12px;display:grid;gap:6px;font-size:15px}
+.co-sum div{display:flex;justify-content:space-between;gap:10px}
+.co-sum div span:last-child{white-space:nowrap;font-variant-numeric:tabular-nums}
+.co-sum .tot{font-weight:700;border-top:1px solid var(--line);padding-top:8px;font-variant-numeric:tabular-nums}
+.fld{display:grid;gap:4px}
+.fld label{font-size:13px;font-weight:600;color:var(--muted)}
+.fld input,.fld select{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%}
+.fld input:focus-visible,.fld select:focus-visible{outline:2px solid var(--sea);outline-offset:1px}
+.err{color:#B3261E;font-size:14px;margin:0}
+.paym{display:grid;gap:8px}
+.paym input{position:absolute;opacity:0;pointer-events:none}
+.paym label{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:12px;cursor:pointer;background:var(--bg)}
+.paym label b{font-weight:700}
+.paym label span{font-size:13px;color:var(--muted)}
+.paym .ic{width:44px;height:28px;border-radius:6px;display:grid;place-items:center;font-size:11px;font-weight:700;flex:none}
+.paym input:checked + label{border-color:var(--sea);box-shadow:0 0 0 2px var(--sea) inset}
+.paym input:focus-visible + label{outline:2px solid var(--moss);outline-offset:2px}
+.paybtn{border:0;border-radius:10px;padding:14px;font:inherit;font-weight:700;font-size:17px;width:100%}
+.paybtn.apple{background:#000;color:#fff}
+.paybtn.mp{background:#5A78FF;color:#fff}
+.paybtn.card{background:var(--moss);color:var(--onaccent)}
+.done{text-align:center;display:grid;gap:8px;padding-block:10px}
+.done .big{font-family:var(--f-display);font-size:26px;margin:0}
+.check{width:56px;height:56px;border-radius:50%;background:var(--moss);color:var(--onaccent);display:grid;place-items:center;font-size:28px;margin:0 auto}
+.cartbar{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:var(--bg);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));display:flex;justify-content:space-between;align-items:center;gap:12px}
+.cartbar b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.cartbar button{background:var(--bg);color:var(--ink);border:0;border-radius:8px;padding:8px 14px;font-weight:700}
+@media (max-width:480px){.macros{grid-template-columns:repeat(2,1fr)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Matseðil · klárir rættir</div>
+    <p class="intro">Til tín, ið vil varðveita ein góðan og sunnan lívsstíl, men ikki hevur tíð, ella vil sleppa undan stríðnum at gera eina sunna og góða máltíð.</p>
+    <h1>Sunnir rættir, settir saman eftir egnum ynski</h1>
+    <p class="lede">Vel ein rætt, set tilhoyr, salat og sós til. Prísur og næringarvirði broytast alt eftir, hvat tú velur. Allir rættirnir kunnu fáast glutenfríir.</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Slag av rættum"><button type="button" role="tab" id="tab-all" aria-selected="true">Rættir</button><button type="button" role="tab" id="tab-veg" aria-selected="false">Veganskir rættir</button></div>
+  <section class="menu" id="menu"></section>
+
+  <section class="drinks-wrap">
+    <h2 class="sec">Drekkivørur</h2>
+    <p class="desc">Allar fløskur eru 0,5 l.</p>
+    <div class="drinks" id="drinks"></div>
+  </section>
+
+  <section class="cart" id="cart">
+    <h3>Kurvin</h3>
+    <div id="cartbody"></div>
+    <div class="group deliv"><div class="glabel">Heinta ella útbering</div><div class="chips" role="radiogroup" aria-label="Heinta ella útbering"><input type="radio" name="deliv" id="deliv-hen" value="0" checked><label for="deliv-hen">Heinta</label><input type="radio" name="deliv" id="deliv-utb" value="50"><label for="deliv-utb">Útbering<span class="x">+50 kr.</span></label></div></div>
+    <div id="carttotal"></div>
+  </section>
+
+  <p class="note">Næringarvirði eru leysliga roknað út frá vanligum mongdum (t.d. 180 g høsnarungi, 200 g kókað rís, 250 g epli). Prísirnir eru uppskot. Pesto inniheldur ost og er ikki veganskt.</p>
+</div>
+
+<div class="co" id="co" hidden role="dialog" aria-modal="true" aria-labelledby="co-title">
+  <div class="co-panel">
+    <div class="co-head"><h2 id="co-title">Gjalding</h2><button type="button" class="co-x" id="co-close" aria-label="Lat aftur">✕</button></div>
+    <p class="demo">Royndarsíða: einki gjald verður tikið enn.</p>
+    <div id="co-body"></div>
+  </div>
+</div>
+<div class="cartbar"><span><b id="cbcount">0</b> rættir · <b id="cbtotal">0 kr.</b></span><button type="button" id="gocart">Vís kurvina</button></div>
+
+<script>
+const DISHES=[
+ {id:"kyl",name:"Høsnarungi við paprika og hvítleyki",desc:"Ovnsbakað høsnarungabringa, kryddað við røktari papriku og hvítleyki.",tags:["Høgt protein","Lítið feitt"],price:90,n:{k:300,p:55,c:0,f:7}},
+ {id:"lax",name:"Laksur við sitrón og dild",desc:"Ovnsbakaður laksur við sitrón, dild og svørtum pipari.",tags:["Omega-3"],price:110,n:{k:310,p:31,c:0,f:20}},
+ {id:"tos",name:"Toskur við kryddurtum",desc:"Pannusteiktur toskaryggur við persillu, sitrón og eitt sindur av smøri.",tags:["Lættasti rætturin","Lítið feitt"],price:100,n:{k:190,p:38,c:0,f:4}},
+ {id:"ney",name:"Neytakjøt teriyaki",desc:"Magurt neytakjøt (5 %) steikt við ingiferi, hvítleyki og soja.",tags:["Høgt protein"],price:95,n:{k:280,p:37,c:8,f:11}},
+ {id:"tof",cat:"veg",name:"Tofu og kikertur í karry",desc:"Tofu og kikertur í mildum karry við kokosmjólk og spinati.",tags:[],v:true,price:85,n:{k:320,p:22,c:22,f:16}},
+ {id:"buf",name:"Búffur við tveimum steiktum eggum",desc:"Saftigur neytabúffur (200 g) steiktur við smøri og timian, borin fram við tveimum steiktum eggum.",tags:["Høgt protein","Mest metta"],price:150,sides:["sot","epl","gro"],defSide:"sot",n:{k:510,p:64,c:0,f:27}},
+ {id:"fla",cat:"veg",name:"Flatbønabollar í tomatsós",desc:"Bakaðir bollar úr reyðum flatbønum í tomatsós við basilikum og hvítleyki.",tags:["Fíbrarík"],v:true,price:85,n:{k:360,p:20,c:45,f:10}},
+ {id:"bon",cat:"veg",name:"Svartar bønir við avocado og mais",desc:"Svartar bønir, avocado, mais og reyðlaukur við lime og koriander.",tags:["Góð feitt"],v:true,price:90,n:{k:380,p:15,c:40,f:18}}
+];
+const SIDES=[
+ {id:"ris",name:"Rís",x:0,n:{k:260,p:5,c:57,f:1}},
+ {id:"epl",name:"Epli",x:0,n:{k:190,p:5,c:42,f:0}},
+ {id:"sot",name:"Søtepli",x:10,n:{k:215,p:4,c:50,f:0}},
+ {id:"gro",name:"Heitt grønmeti",x:0,n:{k:60,p:3,c:9,f:1}}
+];
+const SALAD=[
+ {id:"vid",name:"Við salati",x:10,n:{k:30,p:2,c:5,f:0}},
+ {id:"utt",name:"Uttan salat",x:0,n:{k:0,p:0,c:0,f:0}}
+];
+const SAUCE=[
+ {id:"pes",name:"Pesto",nv:true,x:5,n:{k:90,p:1,c:1,f:9}},
+ {id:"chi",name:"Sweet chili",x:5,n:{k:60,p:0,c:14,f:0}},
+ {id:"ein",name:"Eingin sós",x:0,n:{k:0,p:0,c:0,f:0}}
+];
+const GLUTEN=[
+ {id:"van",name:"Vanligt",x:0},
+ {id:"gf",name:"Glutenfrítt",x:10}
+];
+const SIZE=[
+ {id:"van",name:"Vanlig",x:0,m:1},
+ {id:"sto",name:"Stór",x:30,m:1.5}
+];
+const DRINKS=[
+ {id:"pep",name:"Pepsi",price:25,n:{k:215,p:0,c:55,f:0}},
+ {id:"pmx",name:"Pepsi Max",price:25,n:{k:2,p:0,c:0,f:0}},
+ {id:"fxk",name:"Faxe Kondi",price:25,n:{k:200,p:0,c:50,f:0}},
+ {id:"fxf",name:"Faxe Kondi Free",price:25,n:{k:2,p:0,c:0,f:0}},
+ {id:"vat",name:"Vatn",price:15,n:{k:0,p:0,c:0,f:0}},
+ {id:"brs",name:"Brúsvatn við sitrónsmakki",price:20,n:{k:0,p:0,c:0,f:0}}
+];
+const cart=[];
+let deliv=0;
+const kr=v=>v.toLocaleString("da-DK")+" kr.";
+
+function chips(dish,key,list,def){
+  return `<div class="group"><div class="glabel">${key.label}</div><div class="chips" role="radiogroup" aria-label="${key.label}">`+
+  list.map(o=>{const id=`${dish}-${key.k}-${o.id}`;return `<input type="radio" name="${dish}-${key.k}" id="${id}" value="${o.id}" ${o.id===def?"checked":""}><label for="${id}">${o.name}${o.x?`<span class="x">+${o.x} kr.</span>`:""}</label>`}).join("")+`</div></div>`;
+}
+let tab="all";
+function render(){
+  const list=DISHES.filter(d=>tab==="veg"?d.cat==="veg":d.cat!=="veg");
+  document.getElementById("menu").innerHTML=list.map((d,i)=>`
+  <article class="dish" data-id="${d.id}">
+    <div class="pic" data-pic role="img" aria-label="Mynd av ${d.name}"></div>
+    <div class="dish-head">
+      <div><div class="num">Rættur ${i+1} av ${list.length}</div><h2>${d.name}</h2><p class="desc">${d.desc}</p>
+      <div class="tags">${d.tags.map(t=>`<span class="tag">${t}</span>`).join("")}<span data-diet style="display:contents"></span></div></div>
+      <div class="price" data-price></div>
+    </div>
+    ${chips(d.id,{k:"side",label:"Tilhoyr"},d.sides?SIDES.filter(o=>d.sides.includes(o.id)):SIDES,d.defSide||"ris")}
+    ${chips(d.id,{k:"salad",label:"Salat"},SALAD,"vid")}
+    ${chips(d.id,{k:"sauce",label:"Sós"},SAUCE,d.v?"chi":"pes")}
+    ${chips(d.id,{k:"size",label:"Stødd"},SIZE,"van")}
+    ${chips(d.id,{k:"gluten",label:"Gluten"},GLUTEN,"van")}
+    <div class="macros" data-macros></div>
+    <div class="foot">
+      <div class="legend"><span><i style="background:var(--moss)"></i>Protein</span><span><i style="background:var(--sea)"></i>Kolhydrat</span><span><i style="background:var(--muted)"></i>Feitt</span></div>
+      <button type="button" class="add" id="add-${d.id}">Legg í kurvina</button>
+    </div>
+  </article>`).join("");
+  list.forEach(d=>{
+    const el=document.querySelector(`[data-id="${d.id}"]`);
+    el.addEventListener("change",()=>update(d,el));
+    el.querySelector(".add").addEventListener("click",()=>{cart.push(calc(d,el));drawCart();});
+    update(d,el);
+  });
+}
+function pick(el,d,k,list){const v=el.querySelector(`input[name="${d.id}-${k}"]:checked`).value;return list.find(o=>o.id===v)}
+function calc(d,el){
+  const side=pick(el,d,"side",SIDES),salad=pick(el,d,"salad",SALAD),sauce=pick(el,d,"sauce",SAUCE),size=pick(el,d,"size",SIZE),glu=pick(el,d,"gluten",GLUTEN);
+  const n={k:0,p:0,c:0,f:0};
+  for(const key in n){n[key]=(d.n[key]+side.n[key])*size.m+salad.n[key]+sauce.n[key];n[key]=Math.round(n[key]);}
+  const price=d.price+side.x+salad.x+sauce.x+size.x+glu.x;
+  const sub=[side.name,salad.name.toLowerCase(),sauce.name,size.name].concat(glu.id==="gf"?["glutenfrítt"]:[]).join(" · ");
+  return {name:d.name,sub,price,n};
+}
+function update(d,el){
+  const r=calc(d,el);
+  el.querySelector("[data-price]").innerHTML=`${r.price} <small>kr.</small>`;
+  el.querySelector("[data-pic]").innerHTML=plate(d.id,pick(el,d,"side",SIDES).id,pick(el,d,"salad",SALAD).id,pick(el,d,"sauce",SAUCE).id);
+  const sauce=pick(el,d,"sauce",SAUCE),glu=pick(el,d,"gluten",GLUTEN);
+  el.querySelector("[data-diet]").innerHTML=(glu.id==="gf"?`<span class="tag diet">Glutenfrítt</span>`:"")+(d.v?(sauce.nv?`<span class="tag warn">Ikki veganskt við pesto</span>`:`<span class="tag diet">Veganskt</span>`):"");
+  const pk=r.n.p*4,ck=r.n.c*4,fk=r.n.f*9,t=pk+ck+fk||1;
+  el.querySelector("[data-macros]").innerHTML=
+   `<div class="m kcal"><b>${r.n.k}</b><span>kcal</span></div>
+    <div class="m"><b>${r.n.p} g</b><span>Proteinir</span></div>
+    <div class="m"><b>${r.n.c} g</b><span>Kolhydrat</span></div>
+    <div class="m"><b>${r.n.f} g</b><span>Feitt</span></div>
+    <div class="bar" aria-hidden="true"><i style="width:${pk/t*100}%;background:var(--moss)"></i><i style="width:${ck/t*100}%;background:var(--sea)"></i><i style="width:${fk/t*100}%;background:var(--muted)"></i></div>`;
+}
+function drawCart(){
+  const b=document.getElementById("cartbody");
+  const items=cart.reduce((s,r)=>s+r.price,0);
+  const total=cart.length?items+deliv:0;
+  const tn=cart.reduce((s,r)=>({k:s.k+r.n.k,p:s.p+r.n.p,c:s.c+r.n.c}),{k:0,p:0,c:0});
+  if(!cart.length){b.innerHTML=`<p class="empty">Kurvin er tóm. Vel ein rætt omanfyri og trýst á «Legg í kurvina».</p>`;}
+  else{
+    b.innerHTML=`<ul>${cart.map((r,i)=>`<li><div><div><b>${r.name}</b></div><div class="sub">${r.sub}</div><div class="sub">${r.n.k} kcal · ${r.n.p} g protein · ${r.n.c} g kolhydrat</div><button type="button" class="rm" data-i="${i}">Tak burtur</button></div><b>${kr(r.price)}</b></li>`).join("")}</ul>
+`;
+    b.querySelectorAll(".rm").forEach(x=>x.addEventListener("click",()=>{cart.splice(+x.dataset.i,1);drawCart();}));
+  }
+  document.getElementById("carttotal").innerHTML=cart.length?`${deliv?`<div class="total" style="font-weight:400"><span>Útbering</span><span>${kr(deliv)}</span></div>`:""}<div class="total"><span>Íalt (${cart.length})</span><span>${kr(total)}</span></div><div class="sub" style="margin-top:4px">${tn.k} kcal · ${tn.p} g protein · ${tn.c} g kolhydrat íalt</div><button type="button" class="add pay-go" id="gocheckout">Far til gjalding</button>`:"";
+  document.getElementById("cbcount").textContent=cart.length;
+  document.getElementById("cbtotal").textContent=kr(total);
+}
+document.getElementById("gocart").addEventListener("click",()=>document.getElementById("cart").scrollIntoView({behavior:"smooth"}));
+function rng(seed){let x=seed;return()=>{x=(x*9301+49297)%233280;return x/233280}}
+function plate(dish,side,salad,sauce){
+  const R=rng(dish.charCodeAt(0)*7+side.charCodeAt(0)*13+salad.length);let g="";
+  // board texture + plate
+  g+=`<defs><radialGradient id="pg" cx="45%" cy="40%"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".8" stop-color="#F1EEE8"/><stop offset="1" stop-color="#DCD6CC"/></radialGradient></defs>`;
+  for(let i=0;i<7;i++)g+=`<line x1="0" y1="${15+i*32}" x2="400" y2="${10+i*33}" stroke="#000" stroke-opacity=".05" stroke-width="2"/>`;
+  g+=`<ellipse cx="196" cy="118" rx="128" ry="100" fill="#000" opacity=".18"/><ellipse cx="190" cy="110" rx="126" ry="98" fill="url(#pg)"/><ellipse cx="190" cy="110" rx="100" ry="76" fill="none" stroke="#000" stroke-opacity=".05" stroke-width="2"/>`;
+  // side (left top)
+  if(side==="ris"){g+=`<ellipse cx="140" cy="88" rx="46" ry="34" fill="#F7F4EC"/>`;for(let i=0;i<60;i++){const a=R()*6.28,r=Math.sqrt(R());g+=`<ellipse cx="${140+Math.cos(a)*r*42}" cy="${88+Math.sin(a)*r*30}" rx="3" ry="1.4" transform="rotate(${R()*180} ${140+Math.cos(a)*r*42} ${88+Math.sin(a)*r*30})" fill="#E6E0D2"/>`}}
+  if(side==="epl"){for(let i=0;i<6;i++){const x=110+(i%3)*28+R()*6,y=72+Math.floor(i/3)*30+R()*6;g+=`<circle cx="${x}" cy="${y}" r="15" fill="#E3C77E"/><circle cx="${x-4}" cy="${y-4}" r="5" fill="#F3E2A9"/><circle cx="${x+5}" cy="${y+3}" r="1.5" fill="#6E8F3A"/>`}}
+  if(side==="sot"){for(let i=0;i<6;i++){const x=110+(i%3)*28,y=72+Math.floor(i/3)*30;g+=`<path d="M${x-14} ${y+8} Q${x} ${y-22} ${x+14} ${y+8} Z" fill="#E07B39" transform="rotate(${R()*60-30} ${x} ${y})"/><path d="M${x-14} ${y+8} Q${x} ${y-22} ${x+14} ${y+8}" fill="none" stroke="#B55A22" stroke-width="2" transform="rotate(${R()*60-30} ${x} ${y})"/>`}}
+  if(side==="gro"){for(let i=0;i<5;i++){const x=110+(i%3)*30+R()*8,y=74+Math.floor(i/3)*30+R()*6;g+=`<rect x="${x-3}" y="${y}" width="6" height="12" fill="#8DB86A"/><circle cx="${x-6}" cy="${y}" r="8" fill="#3F7A2E"/><circle cx="${x+6}" cy="${y}" r="8" fill="#4E8B3A"/><circle cx="${x}" cy="${y-6}" r="8" fill="#5A9A44"/>`}for(let i=0;i<4;i++)g+=`<circle cx="${118+i*20}" cy="${124}" r="7" fill="#EB8A2E"/><circle cx="${118+i*20}" cy="${124}" r="3" fill="#F5B060"/>`}
+  // salad (bottom left)
+  if(salad==="vid"){for(let i=0;i<9;i++){const x=120+R()*60,y=140+R()*30;g+=`<path d="M${x} ${y} q12 -16 24 0 q-12 14 -24 0Z" fill="${["#7DB85A","#5E9E3F","#A3C96F"][i%3]}" transform="rotate(${R()*360} ${x+12} ${y})"/>`}g+=`<circle cx="150" cy="150" r="9" fill="#D9412F"/><circle cx="150" cy="150" r="4" fill="#F07A5E"/><circle cx="178" cy="162" r="9" fill="#D9412F"/><circle cx="178" cy="162" r="4" fill="#F07A5E"/><circle cx="132" cy="168" r="8" fill="#CFE3B5" stroke="#4E7A35" stroke-width="2"/>`}
+  // protein (right)
+  const px=240,py=110;
+  if(dish==="kyl"){for(let i=0;i<4;i++){const x=px-30+i*20;g+=`<rect x="${x}" y="${py-38+i*4}" width="22" height="70" rx="10" fill="#C98A4B" transform="rotate(14 ${x} ${py})"/><rect x="${x+3}" y="${py-34+i*4}" width="16" height="60" rx="8" fill="#E8C08A" transform="rotate(14 ${x} ${py})"/>`;}for(let i=0;i<5;i++)g+=`<line x1="${px-40}" y1="${py-30+i*14}" x2="${px+50}" y2="${py-20+i*14}" stroke="#7A4A22" stroke-width="2.5" stroke-opacity=".55"/>`;for(let i=0;i<14;i++)g+=`<circle cx="${px-30+R()*80}" cy="${py-30+R()*60}" r="1.6" fill="#A2321E"/>`}
+  if(dish==="lax"){g+=`<path d="M${px-50} ${py-20} Q${px} ${py-50} ${px+55} ${py-18} L${px+50} ${py+32} Q${px} ${py+48} ${px-48} ${py+28} Z" fill="#EF8A66"/>`;for(let i=0;i<6;i++)g+=`<path d="M${px-40+i*17} ${py-30} q8 30 0 64" stroke="#FBD3C2" stroke-width="3" fill="none"/>`;g+=`<circle cx="${px+70}" cy="${py+50}" r="16" fill="#F4D44C"/><circle cx="${px+70}" cy="${py+50}" r="12" fill="#FBE98A"/>`;for(let i=0;i<10;i++)g+=`<path d="M${px-30+R()*70} ${py-20+R()*40} l6 -6" stroke="#4F7F2F" stroke-width="2"/>`}
+  if(dish==="tos"){g+=`<rect x="${px-52}" y="${py-30}" width="110" height="64" rx="22" fill="#F6F1E6" stroke="#E2D8C3" stroke-width="3"/>`;for(let i=0;i<4;i++)g+=`<path d="M${px-35+i*26} ${py-26} q10 28 0 56" stroke="#E9E0CC" stroke-width="3" fill="none"/>`;g+=`<rect x="${px-48}" y="${py-30}" width="102" height="12" rx="6" fill="#E3B66A" opacity=".7"/>`;for(let i=0;i<18;i++)g+=`<circle cx="${px-45+R()*95}" cy="${py-22+R()*50}" r="2.2" fill="#3F7A2E"/>`;g+=`<path d="M${px+40} ${py+40} a14 14 0 0 1 28 0Z" fill="#F4D44C"/>`}
+  if(dish==="ney"){for(let i=0;i<9;i++){const x=px-40+R()*70,y=py-30+R()*55;g+=`<rect x="${x}" y="${y}" width="30" height="13" rx="6" fill="#6B3A26" transform="rotate(${R()*80-40} ${x+15} ${y+6})"/><rect x="${x+3}" y="${y+2}" width="18" height="4" rx="2" fill="#9A5A35" transform="rotate(${R()*80-40} ${x+15} ${y+6})"/>`}for(let i=0;i<22;i++)g+=`<ellipse cx="${px-40+R()*95}" cy="${py-30+R()*65}" rx="2" ry="1.2" fill="#F5EBD3"/>`;for(let i=0;i<6;i++)g+=`<rect x="${px-30+R()*70}" y="${py-30+R()*60}" width="10" height="3" rx="1.5" fill="#7DB85A"/>`}
+  if(dish==="buf"){g+=`<ellipse cx="${px-4}" cy="${py+8}" rx="54" ry="40" fill="#5A2E1C"/><ellipse cx="${px-6}" cy="${py+4}" rx="48" ry="34" fill="#7A4027"/>`;for(let i=0;i<5;i++)g+=`<line x1="${px-44}" y1="${py-20+i*12}" x2="${px+36}" y2="${py-6+i*12}" stroke="#3E1D10" stroke-width="3" stroke-opacity=".6"/>`;g+=`<path d="M${px-20} ${py-10} q6 -10 12 0 q-6 8 -12 0" fill="#4E7A35"/><path d="M${px+6} ${py+14} q6 -10 12 0 q-6 8 -12 0" fill="#4E7A35"/>`;g+=`<path d="M${px+18} ${py-58} q30 -14 52 6 q16 22 -6 40 q-24 16 -46 0 q-20 -22 0 -46Z" fill="#FBFAF5" stroke="#EFE9DC" stroke-width="2"/><circle cx="${px+42}" cy="${py-36}" r="13" fill="#F5B21E"/><circle cx="${px+38}" cy="${py-40}" r="4" fill="#FCD66B"/>`;g+=`<path d="M${px+40} ${py+6} q30 -12 50 8 q14 22 -8 38 q-24 14 -44 -2 q-18 -22 2 -44Z" fill="#FBFAF5" stroke="#EFE9DC" stroke-width="2"/><circle cx="${px+62}" cy="${py+26}" r="13" fill="#F5B21E"/><circle cx="${px+58}" cy="${py+22}" r="4" fill="#FCD66B"/>`}
+  if(dish==="fla"){g+=`<ellipse cx="${px}" cy="${py+4}" rx="60" ry="46" fill="#C2361F"/><ellipse cx="${px}" cy="${py+4}" rx="56" ry="42" fill="#D9472B"/>`;[[-28,-14],[0,-22],[26,-10],[-18,14],[12,16],[34,18]].forEach(([dx,dy])=>{g+=`<circle cx="${px+dx}" cy="${py+dy}" r="15" fill="#8A5A34"/><circle cx="${px+dx-4}" cy="${py+dy-5}" r="5" fill="#A87449"/>`});for(let i=0;i<6;i++)g+=`<path d="M${px-40+R()*80} ${py-25+R()*50} q6 -8 12 0 q-6 7 -12 0" fill="#3F8A2E"/>`}
+  if(dish==="bon"){g+=`<ellipse cx="${px}" cy="${py+4}" rx="60" ry="46" fill="#EDE6D6"/>`;for(let i=0;i<70;i++){const a=R()*6.28,r=Math.sqrt(R());g+=`<ellipse cx="${px-18+Math.cos(a)*r*30}" cy="${py+Math.sin(a)*r*34}" rx="4" ry="2.6" fill="#1E1A1C" transform="rotate(${R()*180} ${px-18+Math.cos(a)*r*30} ${py+Math.sin(a)*r*34})"/>`}for(let i=0;i<4;i++)g+=`<path d="M${px+14} ${py-30+i*16} q30 -10 40 4 q-20 12 -40 -4Z" fill="#A9C25A" stroke="#4E6A1F" stroke-width="2"/>`;for(let i=0;i<24;i++)g+=`<rect x="${px-30+R()*60}" y="${py+18+R()*20}" width="5" height="5" rx="1.5" fill="#F2C433"/>`;for(let i=0;i<8;i++)g+=`<rect x="${px-40+R()*80}" y="${py-30+R()*60}" width="8" height="3" rx="1.5" fill="#9B3A6B"/>`;g+=`<path d="M${px+40} ${py+30} a12 12 0 0 1 24 0Z" fill="#7DBA3A"/>`}
+  if(dish==="tof"){g+=`<ellipse cx="${px}" cy="${py+2}" rx="62" ry="48" fill="#E2A93B"/><ellipse cx="${px}" cy="${py+2}" rx="62" ry="48" fill="none" stroke="#C88A22" stroke-width="3"/>`;for(let i=0;i<7;i++){const x=px-40+R()*65,y=py-26+R()*45;g+=`<rect x="${x}" y="${y}" width="17" height="17" rx="3" fill="#F7E8C6" stroke="#E6C88A" stroke-width="1.5"/>`}for(let i=0;i<12;i++)g+=`<circle cx="${px-45+R()*90}" cy="${py-25+R()*55}" r="5" fill="#D9B26F" stroke="#B8904C" stroke-width="1"/>`;for(let i=0;i<5;i++)g+=`<path d="M${px-40+R()*80} ${py-20+R()*40} q8 -8 16 0 q-8 8 -16 0Z" fill="#2F6B2A"/>`}
+  // sauce ramekin (top right, on board)
+  if(sauce!=="ein"){const c=sauce==="pes"?["#5C8A2E","#7FAE45"]:["#D9472B","#F07A3A"];g+=`<ellipse cx="352" cy="58" rx="34" ry="30" fill="#000" opacity=".15"/><circle cx="348" cy="52" r="32" fill="#F4F1EA"/><circle cx="348" cy="52" r="24" fill="${c[0]}"/><path d="M332 50 q8 -10 16 0 t16 0" stroke="${c[1]}" stroke-width="4" fill="none"/>`;if(sauce==="chi")for(let i=0;i<8;i++)g+=`<circle cx="${334+R()*28}" cy="${40+R()*24}" r="1.8" fill="#8A1E10"/>`;else for(let i=0;i<8;i++)g+=`<circle cx="${334+R()*28}" cy="${40+R()*24}" r="1.6" fill="#F3E2A9"/>`}
+  // fork
+  g+=`<rect x="352" y="110" width="8" height="100" rx="4" fill="#B9BDC1"/><rect x="346" y="96" width="20" height="22" rx="4" fill="#B9BDC1"/>${[0,1,2,3].map(i=>`<rect x="${347+i*5}" y="70" width="3" height="32" rx="1.5" fill="#B9BDC1"/>`).join("")}`;
+  return `<svg viewBox="0 0 400 220" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">${g}</svg>`;
+}
+function bottle(id){
+  const c={pep:["#1E3F9A","#E32934"],pmx:["#111111","#1E3F9A"],fxk:["#F4C21A","#1D6E3B"],fxf:["#E9EDF0","#1D6E3B"],vat:["#CFE6F2","#8FC3DF"],brs:["#D8EFC4","#E8D84A"]}[id];
+  const glass=id==="vat"||id==="brs";
+  return `<svg class="can" viewBox="0 0 220 90" aria-hidden="true"><rect x="0" y="0" width="220" height="90" rx="8" fill="var(--board)"/><g transform="translate(90 6)"><rect x="12" y="0" width="16" height="10" rx="2" fill="${glass?"#3C7FA8":"#222"}"/><path d="M10 10 h20 l4 16 v54 a4 4 0 0 1 -4 4 h-20 a4 4 0 0 1 -4 -4 v-54 z" fill="${c[0]}" ${glass?'opacity=".85"':''}/><rect x="6" y="38" width="28" height="22" fill="${c[1]}"/>${glass?`<circle cx="14" cy="70" r="2" fill="#fff" opacity=".8"/><circle cx="24" cy="64" r="1.5" fill="#fff" opacity=".8"/><circle cx="18" cy="30" r="1.5" fill="#fff" opacity=".8"/>`:""}</g></svg>`;
+}
+function renderDrinks(){
+  const box=document.getElementById("drinks");
+  box.innerHTML=DRINKS.map(d=>`<div class="drink">${bottle(d.id)}<div class="top"><h3>${d.name}</h3><span class="dp">${d.price} kr.</span></div><div class="dn">${d.n.k} kcal · ${d.n.c} g kolhydrat</div><button type="button" class="add" id="add-${d.id}">Legg í kurvina</button></div>`).join("");
+  DRINKS.forEach(d=>document.getElementById("add-"+d.id).addEventListener("click",()=>{cart.push({name:d.name,sub:"Drekka · 0,5 l",price:d.price,n:{...d.n}});drawCart();}));
+}
+document.querySelectorAll('input[name="deliv"]').forEach(x=>x.addEventListener("change",()=>{deliv=+x.value;drawCart();}));
+["all","veg"].forEach(t=>document.getElementById("tab-"+t).addEventListener("click",()=>{tab=t;document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",b.id==="tab-"+t));render();}));
+const PAYM=[
+ {id:"apple",name:"Apple Pay",hint:"Gjald við iPhone ella Apple Watch",bg:"#000",fg:"#fff",ic:"Pay"},
+ {id:"mp",name:"MobilePay",hint:"Góðkenn í MobilePay-appini",bg:"#5A78FF",fg:"#fff",ic:"MP"},
+ {id:"card",name:"Gjaldskort",hint:"Visa, Mastercard ella Dankort",bg:"var(--sea)",fg:"var(--onaccent)",ic:"KORT"}
+];
+let pm="apple";
+function slots(){const out=[];const now=new Date();for(let d=0;d<3;d++){for(let h=11;h<=19;h++){const t=new Date(now);t.setDate(now.getDate()+d);t.setHours(h,0,0,0);if(t-now<60*60*1000)continue;const day=d===0?"Í dag":d===1?"Í morgin":t.toLocaleDateString("da-DK",{weekday:"long",day:"numeric",month:"numeric"});out.push(`${day} kl. ${String(h).padStart(2,"0")}:00`)}}return out}
+function openCo(){
+  const items=cart.reduce((s,r)=>s+r.price,0),total=items+deliv;
+  document.getElementById("co-body").innerHTML=`
+  <div class="co-sum">${cart.map(r=>`<div><span>${r.name}</span><span>${kr(r.price)}</span></div>`).join("")}
+   ${deliv?`<div><span>Útbering</span><span>${kr(deliv)}</span></div>`:`<div><span>Heinta</span><span>0 kr.</span></div>`}
+   <div class="tot"><span>Íalt</span><span>${kr(total)}</span></div></div>
+  <form id="co-form" novalidate style="display:grid;gap:12px">
+   <div class="fld"><label for="co-name">Navn</label><input id="co-name" autocomplete="name" required></div>
+   <div class="fld"><label for="co-tel">Telefon</label><input id="co-tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="t.d. 21 23 45" required></div>
+   ${deliv?`<div class="fld"><label for="co-addr">Adressa til útbering</label><input id="co-addr" autocomplete="street-address" placeholder="Gøta, húsanummar og bygd" required></div>`:""}
+   <div class="fld"><label for="co-time">${deliv?"Nær skal maturin koma?":"Nær vilt tú heinta?"}</label><select id="co-time">${slots().map(t=>`<option>${t}</option>`).join("")}</select></div>
+   <div class="glabel">Gjaldsháttur</div>
+   <div class="paym">${PAYM.map(m=>`<input type="radio" name="pm" id="pm-${m.id}" value="${m.id}" ${m.id===pm?"checked":""}><label for="pm-${m.id}"><span class="ic" style="background:${m.bg};color:${m.fg}">${m.ic}</span><span><b>${m.name}</b><br><span>${m.hint}</span></span></label>`).join("")}</div>
+   <p class="err" id="co-err" hidden></p>
+   <button type="submit" class="paybtn" id="co-pay"></button>
+  </form>`;
+  const setBtn=()=>{const b=document.getElementById("co-pay");const m=PAYM.find(x=>x.id===pm);b.className="paybtn "+pm;b.textContent=pm==="card"?`Gjalda ${kr(total)}`:`Gjalda ${kr(total)} við ${m.name}`};
+  setBtn();
+  document.querySelectorAll('input[name="pm"]').forEach(x=>x.addEventListener("change",()=>{pm=x.value;setBtn()}));
+  document.getElementById("co-form").addEventListener("submit",e=>{
+    e.preventDefault();
+    const name=document.getElementById("co-name").value.trim(),tel=document.getElementById("co-tel").value.replace(/\s/g,""),addr=deliv?document.getElementById("co-addr").value.trim():"x";
+    const err=document.getElementById("co-err");
+    const miss=[];if(!name)miss.push("navn");if(!/^\d{6}$/.test(tel))miss.push("telefonnummar (6 tøl)");if(!addr)miss.push("adressu");
+    if(miss.length){err.textContent="Fyll út: "+miss.join(", ")+".";err.hidden=false;return}
+    const when=document.getElementById("co-time").value,no=Math.floor(1000+Math.random()*9000);
+    document.getElementById("co-body").innerHTML=`<div class="done"><div class="check" aria-hidden="true">✓</div><p class="big">Takk fyri, ${name.split(" ")[0]}!</p><p style="margin:0">Bílegging nr. <b>${no}</b> · ${kr(total)}</p><p style="margin:0;color:var(--muted)">${deliv?"Útbering":"Heinta"}: ${when}</p><p class="demo" style="margin-top:8px">Hetta er ein royndarsíða. Einki gjald er tikið og eingin bílegging send. Tá ið síðan verður bundin at einum gjaldsveitara, verður kundin sendur til ${PAYM.find(x=>x.id===pm).name} her.</p><button type="button" class="add" id="co-done" style="justify-self:center;margin-top:8px">Liðugt</button></div>`;
+    cart.length=0;drawCart();
+    document.getElementById("co-done").addEventListener("click",closeCo);
+  });
+  document.getElementById("co").hidden=false;document.body.style.overflow="hidden";
+  setTimeout(()=>document.getElementById("co-name")?.focus(),50);
+}
+function closeCo(){document.getElementById("co").hidden=true;document.body.style.overflow=""}
+document.getElementById("co-close").addEventListener("click",closeCo);
+document.getElementById("co").addEventListener("click",e=>{if(e.target.id==="co")closeCo()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeCo()});
+document.getElementById("carttotal").addEventListener("click",e=>{if(e.target.id==="gocheckout")openCo()});
+render();renderDrinks();drawCart();
+</script>
+
+</body>
+</html>
